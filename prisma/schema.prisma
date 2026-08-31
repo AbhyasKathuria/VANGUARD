@@ -1,0 +1,75 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String            @id @default(cuid())
+  name         String
+  phone        String            @unique
+  passwordHash String
+  role         String            // "citizen", "worker", "authority", "volunteer"
+  language     String            @default("en")
+  location     String
+  createdAt    DateTime          @default(now())
+
+  workerProfile    WorkerProfile?
+  volunteerProfile VolunteerProfile?
+
+  createdRequests  Request[]         @relation("CitizenRequests")
+  assignedRequests Request[]         @relation("AssignedRequests")
+  requestUpdates   RequestUpdate[]
+}
+
+model WorkerProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  profession   String
+  availability Boolean  @default(true)
+  location     String
+  verified     Boolean  @default(false)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VolunteerProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  organization String
+  area         String
+  availability Boolean  @default(true)
+  verified     Boolean  @default(false)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Request {
+  id           String          @id @default(cuid())
+  userId       String
+  category     String          // "health", "civic", "emergency", "farming", "other"
+  description  String
+  priority     String          // "low", "medium", "high"
+  location     String
+  status       String          @default("open") // "open", "assigned", "in_progress", "resolved"
+  assignedToId String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  user         User            @relation("CitizenRequests", fields: [userId], references: [id], onDelete: Cascade)
+  assignedTo   User?           @relation("AssignedRequests", fields: [assignedToId], references: [id])
+  updates      RequestUpdate[]
+}
+
+model RequestUpdate {
+  id        String   @id @default(cuid())
+  requestId String
+  userId    String
+  message   String
+  status    String   // "open", "assigned", "in_progress", "resolved"
+  timestamp DateTime @default(now())
+
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
