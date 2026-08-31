@@ -17,13 +17,10 @@ dist/
 .env.test.local
 .env.production.local
 
-# SQLite databases
-*.db
+# SQLite databases (Keep seed database in prisma/dev.db for Vercel Serverless bundling)
 *.db-journal
-*.sqlite
-*.sqlite3
-dev.db
-dev.db-journal
+*.sqlite-journal
+!prisma/dev.db
 
 # IDE & OS files
 .vscode/
