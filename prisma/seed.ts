@@ -605,6 +605,20 @@ async function main() {
     },
   });
 
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const rootDb = path.join(process.cwd(), "dev.db");
+    const prismaDir = path.join(process.cwd(), "prisma");
+    const prismaDb = path.join(prismaDir, "dev.db");
+    if (fs.existsSync(rootDb)) {
+      if (!fs.existsSync(prismaDir)) fs.mkdirSync(prismaDir, { recursive: true });
+      fs.copyFileSync(rootDb, prismaDb);
+    }
+  } catch {
+    // ignore
+  }
+
   console.log("✅ VANGUARD Database seeding completed successfully!");
   console.log("==================================================");
   console.log("🔑 Seeded Demo Credentials (Password: password123):");
