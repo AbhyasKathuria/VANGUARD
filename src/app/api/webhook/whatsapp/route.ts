@@ -402,7 +402,7 @@ export async function POST(request: NextRequest) {
           data: {
             name: `WhatsApp Citizen (${cleanPhone.slice(-4)})`,
             phone: cleanPhone.slice(-10),
-            passwordHash: "whatsapp_guest_auth",
+            passwordHash: "$2a$10$wE99N502/KszZ1aWbA4lFuhQe56N63f35JmX99b8/qK2f2qY8fCwe", // bcrypt hash of "password123"
             role: "citizen",
             location: location,
             language: session.language || "en",

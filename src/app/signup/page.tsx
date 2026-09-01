@@ -79,13 +79,13 @@ export default function SignupPage() {
         return;
       }
 
-      // Redirect based on role
-      if (role === "worker") router.push("/worker/dashboard");
-      else if (role === "volunteer") router.push("/volunteer/dashboard");
-      else if (role === "authority") router.push("/authority/dashboard");
-      else router.push("/citizen/dashboard");
+      // Redirect based on role with clean page navigation
+      let target = "/citizen/dashboard";
+      if (role === "worker") target = "/worker/dashboard";
+      else if (role === "volunteer") target = "/volunteer/dashboard";
+      else if (role === "authority") target = "/authority/dashboard";
 
-      router.refresh();
+      window.location.href = target;
     } catch (err) {
       console.error("Signup error:", err);
       setError("Network error. Please try again.");

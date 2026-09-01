@@ -317,7 +317,7 @@ export default function GuidedTour() {
       });
 
       if (res.ok) {
-        router.push(step.targetPath);
+        window.location.href = step.targetPath;
       }
     } catch (err) {
       console.error("Step action error:", err);

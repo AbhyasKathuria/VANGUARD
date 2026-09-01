@@ -143,8 +143,7 @@ export default function DemoLoginButtons() {
         return;
       }
 
-      router.push(dashboardPath);
-      router.refresh();
+      window.location.href = dashboardPath;
     } catch (err) {
       console.error("Demo login error:", err);
       alert("Error logging into demo account.");

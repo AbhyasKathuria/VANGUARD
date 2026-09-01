@@ -39,15 +39,15 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirect based on user role
+      // Redirect based on user role with clean page navigation
       const role = data.user?.role;
-      if (role === "super_admin") router.push("/superadmin/dashboard");
-      else if (role === "worker") router.push("/worker/dashboard");
-      else if (role === "volunteer") router.push("/volunteer/dashboard");
-      else if (role === "authority") router.push("/authority/dashboard");
-      else router.push("/citizen/dashboard");
+      let target = "/citizen/dashboard";
+      if (role === "super_admin") target = "/superadmin/dashboard";
+      else if (role === "worker") target = "/worker/dashboard";
+      else if (role === "volunteer") target = "/volunteer/dashboard";
+      else if (role === "authority") target = "/authority/dashboard";
 
-      router.refresh();
+      window.location.href = target;
     } catch (err) {
       console.error("Login error:", err);
       setError("Network error. Please try again.");
