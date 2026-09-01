@@ -7,6 +7,8 @@ import PriorityBadge from "@/components/PriorityBadge";
 import CategoryBadge from "@/components/CategoryBadge";
 import Timeline from "@/components/Timeline";
 import MapPinView from "@/components/MapPinView";
+import DashboardLanguageBanner from "@/components/DashboardLanguageBanner";
+import { useLanguage } from "@/lib/i18n/context";
 import {
   ArrowLeft,
   MapPin,
@@ -23,6 +25,7 @@ import {
 export default function RequestDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const requestId = resolvedParams.id;
+  const { t } = useLanguage();
 
   const [request, setRequest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -55,7 +58,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="max-w-3xl mx-auto py-12 flex flex-col items-center justify-center text-[#707070] gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-[#404040]" />
-        <p className="text-xs font-medium">Loading request timeline...</p>
+        <p className="text-xs font-medium">{t.common.loading}</p>
       </div>
     );
   }
@@ -71,13 +74,13 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
           className="inline-flex items-center gap-2 px-4 py-2 bg-[#404040] text-white text-xs font-bold rounded-xl"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Dashboard
+          {t.nav.myRequests}
         </Link>
       </div>
     );
   }
 
-  const createdDate = new Date(request.createdAt).toLocaleString("en-IN", {
+  const createdDate = new Date(request.createdAt).toLocaleString(undefined, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -92,6 +95,9 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="max-w-3xl mx-auto py-6 space-y-6">
+      {/* 1-Click Multi-Lingual Switcher */}
+      <DashboardLanguageBanner />
+
       {/* Back button & Refresh */}
       <div className="flex items-center justify-between">
         <Link
@@ -99,7 +105,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#707070] hover:text-[#404040] transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          Back to My Requests
+          {t.nav.myRequests}
         </Link>
 
         <button
@@ -108,10 +114,10 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
             fetchRequest();
           }}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#404040] bg-white border border-[#dcdcdc] rounded-lg hover:bg-[#f5f5f5] transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#404040] bg-white border border-[#dcdcdc] rounded-lg hover:bg-[#f5f5f5] transition-colors cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh
+          {t.common.refresh}
         </button>
       </div>
 
@@ -132,7 +138,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
         {/* Metadata Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 bg-[#f5f5f5] rounded-xl border border-[#dcdcdc] text-xs">
           <div>
-            <span className="text-[#707070] font-medium block">Location</span>
+            <span className="text-[#707070] font-medium block">{t.common.location}</span>
             <span className="font-bold text-[#404040] flex items-center gap-1 mt-0.5">
               <MapPin className="w-3.5 h-3.5 text-[#a6a6a6]" />
               {request.location}
@@ -158,7 +164,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
               <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-[#404040]">
-                    Assigned Service Handler
+                    {t.citizen.trackingTitle}
                   </span>
                   <span className="text-[10px] font-bold uppercase px-1.5 py-0.2 rounded bg-[#dcdcdc] text-[#262626]">
                     {assignedUser.role}
@@ -185,10 +191,10 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
             {assignedUser.phone && (
               <a
                 href={`tel:${assignedUser.phone}`}
-                className="px-3.5 py-2 bg-[#404040] hover:bg-[#262626] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-colors self-stretch sm:self-auto justify-center"
+                className="px-3.5 py-2 bg-[#404040] hover:bg-[#262626] text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 transition-colors self-stretch sm:self-auto justify-center cursor-pointer"
               >
                 <Phone className="w-3.5 h-3.5" />
-                Call {assignedUser.phone}
+                {t.common.callHelper} {assignedUser.phone}
               </a>
             )}
           </div>
@@ -196,9 +202,9 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
           <div className="p-4 rounded-xl bg-[#f5f5f5] border border-[#dcdcdc] flex items-start gap-3 text-xs text-[#404040]">
             <ShieldAlert className="w-5 h-5 text-[#707070] shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold text-[#404040]">Awaiting Local Authority Assignment</p>
+              <p className="font-bold text-[#404040]">{t.citizen.awaitingAssignmentTitle}</p>
               <p className="text-[#707070] mt-0.5 leading-relaxed">
-                No immediate verified worker was available in your area. Your request has been queued in the Local Authority command center for manual triage and dispatch.
+                {t.citizen.awaitingAssignmentDesc}
               </p>
             </div>
           </div>
@@ -242,7 +248,7 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-bold uppercase tracking-wider text-[#707070] flex items-center gap-2">
             <Clock className="w-4 h-4 text-[#a6a6a6]" />
-            Status History &amp; Audit Trail
+            {t.citizen.timelineHeader}
           </h2>
           <span className="text-xs text-[#a6a6a6]">{request.updates?.length || 0} event(s) recorded</span>
         </div>

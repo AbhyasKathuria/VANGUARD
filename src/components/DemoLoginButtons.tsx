@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/i18n/context";
 import {
   UserCheck,
   ShieldCheck,
@@ -15,6 +16,7 @@ import {
 
 export default function DemoLoginButtons() {
   const router = useRouter();
+  const { locale, t } = useLanguage();
   const [loadingPhone, setLoadingPhone] = useState<string | null>(null);
   const [selectedHub, setSelectedHub] = useState<string>("all");
 
@@ -23,20 +25,20 @@ export default function DemoLoginButtons() {
     {
       role: "super_admin",
       district: "Global",
-      title: "Super Admin HQ",
+      title: t.nav.superAdminCenter,
       name: "Officer Rajeshwar Rao (State HQ)",
       phone: "9876543200",
       icon: Sliders,
       dashboardPath: "/superadmin/dashboard",
       accent: "text-[#53bdeb] font-extrabold",
-      badge: "Cross-District Telemetry & Auth Provisioning",
+      badge: "State HQ Telemetry & Governance",
       isSpecial: true,
     },
     // Authorities
     {
       role: "authority",
       district: "Rampur",
-      title: "Rampur Authority",
+      title: `${t.authority.badge} (Rampur)`,
       name: "Officer Suresh Verma (UP)",
       phone: "9876543213",
       icon: ShieldCheck,
@@ -47,7 +49,7 @@ export default function DemoLoginButtons() {
     {
       role: "authority",
       district: "Mandya",
-      title: "Mandya Authority",
+      title: `${t.authority.badge} (Mandya)`,
       name: "Officer Mallikarjun Patil (KA)",
       phone: "9876543224",
       icon: ShieldCheck,
@@ -59,7 +61,7 @@ export default function DemoLoginButtons() {
     {
       role: "worker",
       district: "Rampur",
-      title: "Worker (Electrician)",
+      title: `${t.worker.badge} (Electrician)`,
       name: "Sunil Electrician (Verified)",
       phone: "9876543211",
       icon: UserCheck,
@@ -70,7 +72,7 @@ export default function DemoLoginButtons() {
     {
       role: "worker",
       district: "Mandya",
-      title: "Worker (Irrigation Mason)",
+      title: `${t.worker.badge} (Irrigation Mason)`,
       name: "Devraj Mason (Verified)",
       phone: "9876543216",
       icon: UserCheck,
@@ -82,7 +84,7 @@ export default function DemoLoginButtons() {
     {
       role: "volunteer",
       district: "Rampur",
-      title: "Volunteer (Rural Care)",
+      title: `${t.volunteer.badge} (Rural Care)`,
       name: "Pooja Volunteer (Verified)",
       phone: "9876543212",
       icon: HeartHandshake,
@@ -93,7 +95,7 @@ export default function DemoLoginButtons() {
     {
       role: "volunteer",
       district: "Shivamogga",
-      title: "Volunteer (Red Cross)",
+      title: `${t.volunteer.badge} (Red Cross)`,
       name: "Sowmya Red Cross (Verified)",
       phone: "9876543223",
       icon: HeartHandshake,
@@ -105,7 +107,7 @@ export default function DemoLoginButtons() {
     {
       role: "citizen",
       district: "Rampur",
-      title: "Citizen (Hindi Native)",
+      title: `${t.citizen.portalBadge} (Rampur)`,
       name: "Ramesh Sharma (Farmer)",
       phone: "9876543210",
       icon: User,
@@ -116,7 +118,7 @@ export default function DemoLoginButtons() {
     {
       role: "citizen",
       district: "Mandya",
-      title: "Citizen (Kannada Native)",
+      title: `${t.citizen.portalBadge} (Mandya)`,
       name: "Basavaraj Gowda (Sugarcane)",
       phone: "9876543230",
       icon: User,
@@ -162,15 +164,15 @@ export default function DemoLoginButtons() {
         <div className="flex items-center gap-1.5">
           <Sparkles className="w-4 h-4 text-[#25D366]" />
           <span className="text-xs font-bold uppercase tracking-wider text-[#262626]">
-            1-Click Multi-District Demo Matrix
+            {t.landing.demoLauncherTitle}
           </span>
         </div>
         <div className="flex items-center gap-1 text-[11px]">
-          <span className="text-[#707070] font-medium">District Hub:</span>
+          <span className="text-[#707070] font-medium">{t.common.location}:</span>
           <select
             value={selectedHub}
             onChange={(e) => setSelectedHub(e.target.value)}
-            className="px-2 py-0.5 rounded-lg border border-[#dcdcdc] bg-white text-xs font-bold focus:outline-none"
+            className="px-2 py-0.5 rounded-lg border border-[#dcdcdc] bg-white text-xs font-bold focus:outline-none cursor-pointer"
           >
             <option value="all">All Hubs (Global)</option>
             <option value="Rampur">Rampur Hub (UP)</option>
