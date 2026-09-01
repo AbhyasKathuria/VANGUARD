@@ -5,6 +5,9 @@ import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import CategoryBadge from "@/components/CategoryBadge";
+import WeatherWidget from "@/components/WeatherWidget";
+import DashboardLanguageBanner from "@/components/DashboardLanguageBanner";
+import { useLanguage } from "@/lib/i18n/context";
 import {
   Shield,
   ShieldCheck,
@@ -20,6 +23,7 @@ import {
 } from "lucide-react";
 
 export default function AuthorityDashboard() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState<any>({
     total: 0,
     open: 0,
@@ -153,18 +157,21 @@ export default function AuthorityDashboard() {
     );
   });
 
+  const primaryLocation = requests[0]?.district || requests[0]?.location || "Rampur";
+
   return (
     <div className="space-y-6">
+      {/* 1-Click Multi-Lingual Dashboard Switcher */}
+      <DashboardLanguageBanner />
+
       {/* Header */}
       <div className="bg-white p-6 rounded-2xl border border-[#dcdcdc] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#404040] bg-[#f5f5f5] px-2.5 py-1 rounded-md border border-[#dcdcdc]">
-            Local Authority Command Center
+            {t.authority.badge}
           </span>
-          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">Civic Triage &amp; Dispatch</h1>
-          <p className="text-xs text-[#707070] mt-0.5">
-            Monitor all village service requests, resolve bottlenecks, and manage verified local personnel.
-          </p>
+          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">{t.authority.pageTitle}</h1>
+          <p className="text-xs text-[#707070] mt-0.5">{t.authority.pageDesc}</p>
         </div>
 
         <button
@@ -173,12 +180,15 @@ export default function AuthorityDashboard() {
             fetchAuthorityData();
           }}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] text-xs font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] text-xs font-semibold transition-colors cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh Data
+          {t.common.refresh}
         </button>
       </div>
+
+      {/* Real-Time District Weather & Disaster Monitoring */}
+      <WeatherWidget location={primaryLocation} />
 
       {/* Aggregate Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">

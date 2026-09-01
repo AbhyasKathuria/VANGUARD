@@ -5,9 +5,13 @@ import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import CategoryBadge from "@/components/CategoryBadge";
+import WeatherWidget from "@/components/WeatherWidget";
+import DashboardLanguageBanner from "@/components/DashboardLanguageBanner";
+import { useLanguage } from "@/lib/i18n/context";
 import { PlusCircle, Clock, MapPin, ArrowRight, Loader2, RefreshCw, AlertCircle } from "lucide-react";
 
 export default function CitizenDashboard() {
+  const { t } = useLanguage();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -31,18 +35,21 @@ export default function CitizenDashboard() {
     fetchMyRequests();
   }, []);
 
+  const primaryLocation = requests[0]?.district || requests[0]?.location || "Rampur";
+
   return (
     <div className="space-y-6">
+      {/* 1-Click Multi-Lingual Dashboard Switcher */}
+      <DashboardLanguageBanner />
+
       {/* Top Header Card */}
       <div className="bg-white p-6 rounded-2xl border border-[#dcdcdc] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#404040] bg-[#f5f5f5] px-2.5 py-1 rounded-md border border-[#dcdcdc]">
-            Citizen Portal
+            {t.citizen.portalBadge}
           </span>
-          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">My Service Requests</h1>
-          <p className="text-xs text-[#707070] mt-0.5">
-            Track real-time status changes and view response timelines for your reported issues.
-          </p>
+          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">{t.citizen.pageTitle}</h1>
+          <p className="text-xs text-[#707070] mt-0.5">{t.citizen.pageDesc}</p>
         </div>
 
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
@@ -52,7 +59,7 @@ export default function CitizenDashboard() {
               fetchMyRequests();
             }}
             disabled={refreshing}
-            className="p-2.5 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] transition-colors"
+            className="p-2.5 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] transition-colors cursor-pointer"
             title="Refresh requests"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
@@ -60,13 +67,16 @@ export default function CitizenDashboard() {
 
           <Link
             href="/citizen/new-request"
-            className="flex-1 sm:flex-none px-4 py-2.5 bg-[#404040] hover:bg-[#262626] text-white text-xs font-bold rounded-xl shadow-xs flex items-center justify-center gap-2 transition-colors"
+            className="flex-1 sm:flex-none px-4 py-2.5 bg-[#404040] hover:bg-[#262626] text-white text-xs font-bold rounded-xl shadow-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
-            Raise New Request
+            {t.nav.raiseRequest}
           </Link>
         </div>
       </div>
+
+      {/* Real-Time Agricultural & Civic Weather Widget */}
+      <WeatherWidget location={primaryLocation} />
 
       {/* Requests List */}
       {loading ? (

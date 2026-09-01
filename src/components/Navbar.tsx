@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { UserSession } from "@/lib/types";
+import { useLanguage } from "@/lib/i18n/context";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import {
   Shield,
   LogOut,
@@ -14,6 +16,9 @@ import {
   Menu,
   X,
   MapPin,
+  Layers,
+  HelpCircle,
+  Sliders,
 } from "lucide-react";
 
 interface NavbarProps {
@@ -23,6 +28,7 @@ interface NavbarProps {
 export default function Navbar({ user }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -42,6 +48,12 @@ export default function Navbar({ user }: NavbarProps) {
   const getRoleBadge = (role?: string) => {
     if (!role) return null;
     switch (role) {
+      case "super_admin":
+        return (
+          <span className="bg-[#1a1a1a] text-[#53bdeb] text-[11px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider border border-[#53bdeb]/40 shadow-xs">
+            Super Admin
+          </span>
+        );
       case "authority":
         return (
           <span className="bg-[#262626] text-white text-[11px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-[#707070]">
@@ -82,95 +94,136 @@ export default function Navbar({ user }: NavbarProps) {
               </div>
               <div>
                 <span className="font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5">
-                  VANGUARD
+                  {t.common.appName}
                   <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 bg-white/15 text-[#dcdcdc] rounded border border-white/20">
-                    MVP
+                    {t.common.mvpBadge}
                   </span>
                 </span>
-                <p className="text-[11px] text-[#dcdcdc] -mt-1 hidden sm:block">Rural Service Routing Platform</p>
+                <p className="text-[11px] text-[#dcdcdc] -mt-1 hidden sm:block">{t.common.appSubtitle}</p>
               </div>
             </Link>
           </div>
 
           {/* Desktop Navigation Links */}
-          {user && (
-            <nav className="hidden md:flex items-center gap-1.5">
-              {user.role === "citizen" && (
-                <>
+          <div className="hidden md:flex items-center gap-2">
+            {/* Public Links */}
+            <div className="flex items-center gap-1 mr-2 border-r border-white/20 pr-2">
+              <Link
+                href="/services"
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                  pathname === "/services" ? "bg-white/20 text-white font-bold" : "text-[#dcdcdc] hover:bg-white/10"
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                {t.nav.services}
+              </Link>
+              <Link
+                href="/faq"
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                  pathname === "/faq" ? "bg-white/20 text-white font-bold" : "text-[#dcdcdc] hover:bg-white/10"
+                }`}
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                {t.nav.faq}
+              </Link>
+            </div>
+
+            {user && (
+              <nav className="flex items-center gap-1.5">
+                {user.role === "citizen" && (
+                  <>
+                    <Link
+                      href="/citizen/dashboard"
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                        pathname === "/citizen/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
+                      }`}
+                    >
+                      <ListOrdered className="w-4 h-4 text-[#dcdcdc]" />
+                      {t.nav.myRequests}
+                    </Link>
+                    <Link
+                      href="/citizen/new-request"
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                        pathname === "/citizen/new-request"
+                          ? "bg-white text-[#404040] font-bold shadow-xs"
+                          : "bg-white/15 text-white hover:bg-white/25 border border-white/20"
+                      }`}
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      {t.nav.raiseRequest}
+                    </Link>
+                  </>
+                )}
+
+                {user.role === "worker" && (
                   <Link
-                    href="/citizen/dashboard"
+                    href="/worker/dashboard"
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                      pathname === "/citizen/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
+                      pathname === "/worker/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
                     }`}
                   >
-                    <ListOrdered className="w-4 h-4 text-[#dcdcdc]" />
-                    My Requests
+                    <CheckCircle className="w-4 h-4 text-[#dcdcdc]" />
+                    {t.nav.assignedJobs}
                   </Link>
+                )}
+
+                {user.role === "volunteer" && (
+                  <>
+                    <Link
+                      href="/volunteer/dashboard"
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                        pathname === "/volunteer/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
+                      }`}
+                    >
+                      <Users className="w-4 h-4 text-[#dcdcdc]" />
+                      {t.nav.volunteerHub}
+                    </Link>
+                    <Link
+                      href="/citizen/new-request"
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-[#dcdcdc] hover:bg-white/10"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      {t.nav.raiseForCitizen}
+                    </Link>
+                  </>
+                )}
+
+                {user.role === "authority" && (
                   <Link
-                    href="/citizen/new-request"
+                    href="/authority/dashboard"
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                      pathname === "/citizen/new-request"
-                        ? "bg-white text-[#404040] font-bold shadow-xs"
-                        : "bg-white/15 text-white hover:bg-white/25 border border-white/20"
+                      pathname === "/authority/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
                     }`}
                   >
-                    <PlusCircle className="w-4 h-4" />
-                    Raise Request
+                    <Shield className="w-4 h-4 text-[#dcdcdc]" />
+                    {t.nav.authorityCenter}
                   </Link>
-                </>
-              )}
+                )}
 
-              {user.role === "worker" && (
-                <Link
-                  href="/worker/dashboard"
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                    pathname === "/worker/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
-                  }`}
-                >
-                  <CheckCircle className="w-4 h-4 text-[#dcdcdc]" />
-                  Assigned Jobs
-                </Link>
-              )}
-
-              {user.role === "volunteer" && (
-                <>
+                {user.role === "super_admin" && (
                   <Link
-                    href="/volunteer/dashboard"
+                    href="/superadmin/dashboard"
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                      pathname === "/volunteer/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
+                      pathname === "/superadmin/dashboard"
+                        ? "bg-[#262626] text-[#53bdeb] font-bold border border-[#53bdeb]/40"
+                        : "text-[#dcdcdc] hover:bg-white/10"
                     }`}
                   >
-                    <Users className="w-4 h-4 text-[#dcdcdc]" />
-                    Volunteer Hub
+                    <Sliders className="w-4 h-4 text-[#53bdeb]" />
+                    {t.nav.superAdminCenter}
                   </Link>
-                  <Link
-                    href="/citizen/new-request"
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-[#dcdcdc] hover:bg-white/10"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                    Raise for Citizen
-                  </Link>
-                </>
-              )}
+                )}
+              </nav>
+            )}
+          </div>
 
-              {user.role === "authority" && (
-                <Link
-                  href="/authority/dashboard"
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                    pathname === "/authority/dashboard" ? "bg-[#262626] text-white" : "text-[#dcdcdc] hover:bg-white/10"
-                  }`}
-                >
-                  <Shield className="w-4 h-4 text-[#dcdcdc]" />
-                  Authority Command Center
-                </Link>
-              )}
-            </nav>
-          )}
+          {/* User Profile Info & Language Switcher & Logout */}
+          <div className="flex items-center gap-2.5">
+            {/* Multi-Language Dropdown */}
+            <LanguageSwitcher />
 
-          {/* User Profile Info & Logout */}
-          <div className="flex items-center gap-3">
             {user ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <div className="hidden sm:flex flex-col items-end text-right">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-semibold text-white">{user.name}</span>
@@ -178,7 +231,7 @@ export default function Navbar({ user }: NavbarProps) {
                   </div>
                   <span className="text-[11px] text-[#dcdcdc] flex items-center gap-1 mt-0.5">
                     <MapPin className="w-3 h-3 text-[#a6a6a6]" />
-                    {user.location}
+                    {user.district || user.location}
                   </span>
                 </div>
 
@@ -186,10 +239,10 @@ export default function Navbar({ user }: NavbarProps) {
                   onClick={handleLogout}
                   disabled={loggingOut}
                   title="Log out"
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#dcdcdc] hover:text-white bg-[#262626] hover:bg-black border border-[#707070] rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#dcdcdc] hover:text-white bg-[#262626] hover:bg-black border border-[#707070] rounded-lg transition-colors cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Logout</span>
+                  <span className="hidden sm:inline">{t.common.logout}</span>
                 </button>
               </div>
             ) : (
@@ -198,95 +251,122 @@ export default function Navbar({ user }: NavbarProps) {
                   href="/login"
                   className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#262626] hover:bg-black rounded-lg border border-[#707070] transition-colors"
                 >
-                  Sign In
+                  {t.common.signIn}
                 </Link>
                 <Link
                   href="/signup"
                   className="px-3.5 py-1.5 text-xs font-bold text-[#404040] bg-[#f5f5f5] hover:bg-white rounded-lg shadow-xs transition-colors"
                 >
-                  Sign Up
+                  {t.common.signUp}
                 </Link>
               </div>
             )}
 
             {/* Mobile menu toggle */}
-            {user && (
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-1.5 rounded-lg bg-[#262626] text-[#dcdcdc] hover:text-white border border-[#707070]"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-            )}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-1.5 rounded-lg bg-[#262626] text-[#dcdcdc] hover:text-white border border-[#707070]"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
 
         {/* Mobile menu */}
-        {user && mobileMenuOpen && (
+        {mobileMenuOpen && (
           <div className="md:hidden py-3 border-t border-[#707070] space-y-2">
-            <div className="px-2 py-1.5 bg-[#262626] rounded-lg mb-2 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold text-white">{user.name}</p>
-                <p className="text-[11px] text-[#dcdcdc]">{user.location}</p>
+            {user && (
+              <div className="px-2 py-1.5 bg-[#262626] rounded-lg mb-2 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-white">{user.name}</p>
+                  <p className="text-[11px] text-[#dcdcdc]">{user.district || user.location}</p>
+                </div>
+                {getRoleBadge(user.role)}
               </div>
-              {getRoleBadge(user.role)}
+            )}
+
+            <div className="grid grid-cols-2 gap-2 pb-2 border-b border-white/10">
+              <Link
+                href="/services"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#dcdcdc] hover:bg-[#262626]"
+              >
+                🛠️ {t.nav.services}
+              </Link>
+              <Link
+                href="/faq"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#dcdcdc] hover:bg-[#262626]"
+              >
+                ❓ {t.nav.faq}
+              </Link>
             </div>
 
-            {user.role === "citizen" && (
+            {user?.role === "citizen" && (
               <>
                 <Link
                   href="/citizen/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-lg text-xs font-semibold text-[#dcdcdc] hover:bg-[#262626]"
                 >
-                  📋 My Requests
+                  📋 {t.nav.myRequests}
                 </Link>
                 <Link
                   href="/citizen/new-request"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-lg text-xs font-semibold bg-white text-[#404040] font-bold"
                 >
-                  ➕ Raise Request
+                  ➕ {t.nav.raiseRequest}
                 </Link>
               </>
             )}
 
-            {user.role === "worker" && (
+            {user?.role === "worker" && (
               <Link
                 href="/worker/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-lg text-xs font-semibold text-[#dcdcdc] hover:bg-[#262626]"
               >
-                🛠️ Assigned Jobs
+                🛠️ {t.nav.assignedJobs}
               </Link>
             )}
 
-            {user.role === "volunteer" && (
+            {user?.role === "volunteer" && (
               <>
                 <Link
                   href="/volunteer/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-lg text-xs font-semibold text-[#dcdcdc] hover:bg-[#262626]"
                 >
-                  🤝 Volunteer Hub &amp; Open Pool
+                  🤝 {t.nav.volunteerHub}
                 </Link>
                 <Link
                   href="/citizen/new-request"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-2 rounded-lg text-xs font-semibold text-[#dcdcdc] hover:bg-[#262626]"
                 >
-                  ➕ Raise on behalf of Citizen
+                  ➕ {t.nav.raiseForCitizen}
                 </Link>
               </>
             )}
 
-            {user.role === "authority" && (
+            {user?.role === "authority" && (
               <Link
                 href="/authority/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3 py-2 rounded-lg text-xs font-semibold text-[#dcdcdc] hover:bg-[#262626]"
               >
-                🏛️ Authority Command Center
+                🏛️ {t.nav.authorityCenter}
+              </Link>
+            )}
+
+            {user?.role === "super_admin" && (
+              <Link
+                href="/superadmin/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg text-xs font-bold text-[#53bdeb] bg-[#262626] border border-[#53bdeb]/40"
+              >
+                ⚡ {t.nav.superAdminCenter}
               </Link>
             )}
           </div>

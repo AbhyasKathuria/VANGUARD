@@ -6,6 +6,7 @@ import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import CategoryBadge from "@/components/CategoryBadge";
 import Timeline from "@/components/Timeline";
+import MapPinView from "@/components/MapPinView";
 import {
   ArrowLeft,
   MapPin,
@@ -200,6 +201,38 @@ export default function RequestDetailPage({ params }: { params: Promise<{ id: st
                 No immediate verified worker was available in your area. Your request has been queued in the Local Authority command center for manual triage and dispatch.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* GIS Map Pin View */}
+        {request.latitude && request.longitude && (
+          <div className="pt-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#707070] mb-2 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#a6a6a6]" />
+              Geographic Service Location &amp; Dispatch Area
+            </h3>
+            <MapPinView
+              requestLocation={{
+                latitude: request.latitude,
+                longitude: request.longitude,
+                label: request.location,
+              }}
+              helperLocation={
+                assignedUser && (assignedUser.workerProfile?.latitude || assignedUser.volunteerProfile?.latitude)
+                  ? {
+                      latitude:
+                        assignedUser.workerProfile?.latitude || assignedUser.volunteerProfile?.latitude,
+                      longitude:
+                        assignedUser.workerProfile?.longitude || assignedUser.volunteerProfile?.longitude,
+                      name: assignedUser.name,
+                      role: assignedUser.role,
+                      label: assignedUser.workerProfile?.location || assignedUser.volunteerProfile?.area,
+                    }
+                  : null
+              }
+              radiusKm={request.category === "emergency" ? 30 : 15}
+              height="240px"
+            />
           </div>
         )}
       </div>

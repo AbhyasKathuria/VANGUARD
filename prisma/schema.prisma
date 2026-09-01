@@ -12,9 +12,11 @@ model User {
   name         String
   phone        String            @unique
   passwordHash String
-  role         String            // "citizen", "worker", "authority", "volunteer"
+  role         String            // "citizen", "worker", "authority", "volunteer", "super_admin"
   language     String            @default("en")
   location     String
+  district     String            @default("Rampur")
+  active       Boolean           @default(true)
   createdAt    DateTime          @default(now())
 
   workerProfile    WorkerProfile?
@@ -31,6 +33,9 @@ model WorkerProfile {
   profession   String
   availability Boolean  @default(true)
   location     String
+  district     String?  @default("Rampur")
+  latitude     Float?
+  longitude    Float?
   verified     Boolean  @default(false)
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -40,22 +45,29 @@ model VolunteerProfile {
   userId       String   @unique
   organization String
   area         String
+  district     String?  @default("Rampur")
+  latitude     Float?
+  longitude    Float?
   availability Boolean  @default(true)
   verified     Boolean  @default(false)
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Request {
-  id           String          @id @default(cuid())
-  userId       String
-  category     String          // "health", "civic", "emergency", "farming", "other"
-  description  String
-  priority     String          // "low", "medium", "high"
-  location     String
-  status       String          @default("open") // "open", "assigned", "in_progress", "resolved"
-  assignedToId String?
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id            String          @id @default(cuid())
+  userId        String
+  category      String          // "health", "civic", "emergency", "farming", "other"
+  description   String
+  priority      String          // "low", "medium", "high"
+  location      String
+  district      String          @default("Rampur")
+  latitude      Float?
+  longitude     Float?
+  attachmentUrl String?
+  status        String          @default("open") // "open", "assigned", "in_progress", "resolved"
+  assignedToId  String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
   user         User            @relation("CitizenRequests", fields: [userId], references: [id], onDelete: Cascade)
   assignedTo   User?           @relation("AssignedRequests", fields: [assignedToId], references: [id])

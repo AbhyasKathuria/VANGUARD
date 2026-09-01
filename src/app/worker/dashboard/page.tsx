@@ -5,6 +5,9 @@ import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import CategoryBadge from "@/components/CategoryBadge";
+import WeatherWidget from "@/components/WeatherWidget";
+import DashboardLanguageBanner from "@/components/DashboardLanguageBanner";
+import { useLanguage } from "@/lib/i18n/context";
 import {
   Wrench,
   Clock,
@@ -16,9 +19,11 @@ import {
   RefreshCw,
   Send,
   X,
+  ImageIcon,
 } from "lucide-react";
 
 export default function WorkerDashboard() {
+  const { t } = useLanguage();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -82,23 +87,26 @@ export default function WorkerDashboard() {
     setTargetStatus(status);
     setUpdateNote(
       status === "in_progress"
-        ? "Worker arrived at location and commenced inspection/repairs."
-        : "Work completed successfully and issue resolved on site."
+        ? "Worker arrived on site with required tools and materials."
+        : "Field task completed successfully and tested on site."
     );
   };
 
+  const primaryLocation = requests[0]?.district || requests[0]?.location || "Rampur";
+
   return (
     <div className="space-y-6">
+      {/* 1-Click Multi-Lingual Dashboard Switcher */}
+      <DashboardLanguageBanner />
+
       {/* Header */}
       <div className="bg-white p-6 rounded-2xl border border-[#dcdcdc] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#404040] bg-[#f5f5f5] px-2.5 py-1 rounded-md border border-[#dcdcdc]">
-            Worker Dashboard
+            {t.worker.badge}
           </span>
-          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">Assigned Service Tasks</h1>
-          <p className="text-xs text-[#707070] mt-0.5">
-            Accept tasks, update on-site progress, and mark completed jobs.
-          </p>
+          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">{t.worker.pageTitle}</h1>
+          <p className="text-xs text-[#707070] mt-0.5">{t.worker.pageDesc}</p>
         </div>
 
         <button
@@ -107,12 +115,15 @@ export default function WorkerDashboard() {
             fetchAssignedRequests();
           }}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] text-xs font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] text-xs font-semibold transition-colors cursor-pointer"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
-          Refresh Tasks
+          {t.common.refresh}
         </button>
       </div>
+
+      {/* Real-Time Agricultural & Weather Advisory for Worker Safety */}
+      <WeatherWidget location={primaryLocation} />
 
       {/* Requests List */}
       {loading ? (
@@ -125,9 +136,9 @@ export default function WorkerDashboard() {
           <div className="w-12 h-12 rounded-full bg-[#f5f5f5] text-[#404040] flex items-center justify-center mx-auto border border-[#dcdcdc]">
             <Wrench className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-[#404040]">No active assigned tasks</h3>
+          <h3 className="text-base font-bold text-[#404040]">{t.worker.noTasksTitle}</h3>
           <p className="text-xs text-[#707070] max-w-sm mx-auto">
-            When citizens in your area raise requests matching your skills, the routing engine will assign them to you automatically.
+            {t.worker.noTasksDesc}
           </p>
         </div>
       ) : (
@@ -155,6 +166,16 @@ export default function WorkerDashboard() {
                   </div>
 
                   <p className="text-sm font-semibold text-[#404040] leading-snug">{req.description}</p>
+
+                  {/* Photo Attachment if present */}
+                  {req.attachmentUrl && (
+                    <div className="relative rounded-xl overflow-hidden border border-[#dcdcdc] max-h-36 bg-[#f5f5f5]">
+                      <img src={req.attachmentUrl} alt="Site attachment" className="w-full h-36 object-cover" />
+                      <span className="absolute bottom-1.5 left-1.5 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">
+                        <ImageIcon className="w-3 h-3" /> Citizen Attachment
+                      </span>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 gap-2 p-3 bg-[#f5f5f5] rounded-xl text-xs border border-[#dcdcdc]">
                     <div>

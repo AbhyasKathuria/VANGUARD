@@ -35,8 +35,15 @@ export async function GET(request: Request) {
           { status: "open", assignedToId: null },
         ];
       }
-    } else if (user.role === "authority") {
-      // Authority can view everything with optional filters
+    } else if (user.role === "authority" || user.role === "super_admin") {
+      // Authority / Super Admin can view all requests with optional filters
+      const districtFilter = searchParams.get("district");
+      if (districtFilter && districtFilter !== "all") {
+        whereClause.district = districtFilter;
+      } else if (user.role === "authority" && user.district && user.district !== "All Districts") {
+        whereClause.district = user.district;
+      }
+
       if (statusFilter && statusFilter !== "all") {
         whereClause.status = statusFilter;
       }
@@ -49,7 +56,7 @@ export async function GET(request: Request) {
       where: whereClause,
       include: {
         user: {
-          select: { id: true, name: true, phone: true, location: true },
+          select: { id: true, name: true, phone: true, location: true, district: true },
         },
         assignedTo: {
           select: {
@@ -92,7 +99,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { category, description, location } = body;
+    const { category, description, location, district, latitude, longitude, attachmentUrl } = body;
 
     if (!category || !description || !location) {
       return NextResponse.json(
@@ -108,12 +115,22 @@ export async function POST(request: Request) {
 
     const priority = getCategoryDefaultPriority(category as RequestCategory);
 
-    // Run Rule-Based Routing Engine
+    const providedCoords =
+      latitude !== undefined && longitude !== undefined
+        ? { latitude: parseFloat(latitude), longitude: parseFloat(longitude) }
+        : null;
+
+    // Run Rule-Based Routing Engine with Geolocation support
     const routingResult = await determineRoutingAndAssignment(
       category as RequestCategory,
       location,
-      description
+      description,
+      providedCoords
     );
+
+    const finalDistrict = district || user.district || "Rampur";
+    const finalLat = routingResult.coordinates?.latitude || providedCoords?.latitude || null;
+    const finalLon = routingResult.coordinates?.longitude || providedCoords?.longitude || null;
 
     // Create the Request and its initial audit trail update atomically
     const newRequest = await prisma.request.create({
@@ -123,6 +140,10 @@ export async function POST(request: Request) {
         description,
         priority,
         location,
+        district: finalDistrict,
+        latitude: finalLat,
+        longitude: finalLon,
+        attachmentUrl: attachmentUrl || null,
         status: routingResult.status,
         assignedToId: routingResult.assignedToId,
         updates: {

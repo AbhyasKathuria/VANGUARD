@@ -2,58 +2,133 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { UserCheck, ShieldCheck, HeartHandshake, User, Loader2 } from "lucide-react";
+import {
+  UserCheck,
+  ShieldCheck,
+  HeartHandshake,
+  User,
+  Sliders,
+  Loader2,
+  MapPin,
+  Sparkles,
+} from "lucide-react";
 
 export default function DemoLoginButtons() {
   const router = useRouter();
-  const [loadingRole, setLoadingRole] = useState<string | null>(null);
+  const [loadingPhone, setLoadingPhone] = useState<string | null>(null);
+  const [selectedHub, setSelectedHub] = useState<string>("all");
 
   const demoAccounts = [
+    // Super Admin
     {
-      role: "citizen",
-      title: "Citizen Demo",
-      name: "Ramesh Sharma",
-      phone: "9876543210",
-      icon: User,
-      bgColor: "bg-white hover:bg-[#fafafa] border-[#dcdcdc] text-[#404040]",
-      accent: "text-[#707070] font-semibold",
-      badge: "Submit & Track Requests",
+      role: "super_admin",
+      district: "Global",
+      title: "Super Admin HQ",
+      name: "Officer Rajeshwar Rao (State HQ)",
+      phone: "9876543200",
+      icon: Sliders,
+      dashboardPath: "/superadmin/dashboard",
+      accent: "text-[#53bdeb] font-extrabold",
+      badge: "Cross-District Telemetry & Auth Provisioning",
+      isSpecial: true,
     },
+    // Authorities
     {
-      role: "worker",
-      title: "Worker Demo",
-      name: "Sunil Electrician",
-      phone: "9876543211",
-      icon: UserCheck,
-      bgColor: "bg-white hover:bg-[#fafafa] border-[#dcdcdc] text-[#404040]",
-      accent: "text-[#707070] font-semibold",
-      badge: "Assigned Tasks & Updates",
-    },
-    {
-      role: "volunteer",
-      title: "Volunteer Demo",
-      name: "Pooja (NGO)",
-      phone: "9876543212",
-      icon: HeartHandshake,
-      bgColor: "bg-white hover:bg-[#fafafa] border-[#dcdcdc] text-[#404040]",
-      accent: "text-[#707070] font-semibold",
-      badge: "Community Pool & Claim",
+      role: "authority",
+      district: "Rampur",
+      title: "Rampur Authority",
+      name: "Officer Suresh Verma (UP)",
+      phone: "9876543213",
+      icon: ShieldCheck,
+      dashboardPath: "/authority/dashboard",
+      accent: "text-[#262626] font-bold",
+      badge: "Rampur Command Center & Verification",
     },
     {
       role: "authority",
-      title: "Authority Demo",
-      name: "Officer Suresh",
-      phone: "9876543213",
+      district: "Mandya",
+      title: "Mandya Authority",
+      name: "Officer Mallikarjun Patil (KA)",
+      phone: "9876543224",
       icon: ShieldCheck,
-      bgColor: "bg-white hover:bg-[#fafafa] border-[#dcdcdc] text-[#404040]",
+      dashboardPath: "/authority/dashboard",
+      accent: "text-[#262626] font-bold",
+      badge: "Mandya Command Center & Verification",
+    },
+    // Workers
+    {
+      role: "worker",
+      district: "Rampur",
+      title: "Worker (Electrician)",
+      name: "Sunil Electrician (Verified)",
+      phone: "9876543211",
+      icon: UserCheck,
+      dashboardPath: "/worker/dashboard",
       accent: "text-[#707070] font-semibold",
-      badge: "Full Triage & Dispatch",
+      badge: "Assigned Tasks & On-Site Updates",
+    },
+    {
+      role: "worker",
+      district: "Mandya",
+      title: "Worker (Irrigation Mason)",
+      name: "Devraj Mason (Verified)",
+      phone: "9876543216",
+      icon: UserCheck,
+      dashboardPath: "/worker/dashboard",
+      accent: "text-[#707070] font-semibold",
+      badge: "Farming & Canal Labor Dispatch",
+    },
+    // Volunteers
+    {
+      role: "volunteer",
+      district: "Rampur",
+      title: "Volunteer (Rural Care)",
+      name: "Pooja Volunteer (Verified)",
+      phone: "9876543212",
+      icon: HeartHandshake,
+      dashboardPath: "/volunteer/dashboard",
+      accent: "text-[#707070] font-semibold",
+      badge: "Emergency Triage & Community Pool",
+    },
+    {
+      role: "volunteer",
+      district: "Shivamogga",
+      title: "Volunteer (Red Cross)",
+      name: "Sowmya Red Cross (Verified)",
+      phone: "9876543223",
+      icon: HeartHandshake,
+      dashboardPath: "/volunteer/dashboard",
+      accent: "text-[#707070] font-semibold",
+      badge: "Medical & Trauma Assistance Pool",
+    },
+    // Citizens
+    {
+      role: "citizen",
+      district: "Rampur",
+      title: "Citizen (Hindi Native)",
+      name: "Ramesh Sharma (Farmer)",
+      phone: "9876543210",
+      icon: User,
+      dashboardPath: "/citizen/dashboard",
+      accent: "text-[#707070] font-semibold",
+      badge: "Submit & Track Village Issues",
+    },
+    {
+      role: "citizen",
+      district: "Mandya",
+      title: "Citizen (Kannada Native)",
+      name: "Basavaraj Gowda (Sugarcane)",
+      phone: "9876543230",
+      icon: User,
+      dashboardPath: "/citizen/dashboard",
+      accent: "text-[#707070] font-semibold",
+      badge: "Submit & Track Irrigation Issues",
     },
   ];
 
-  const handleDemoLogin = async (phone: string, role: string) => {
+  const handleDemoLogin = async (phone: string, dashboardPath: string) => {
     try {
-      setLoadingRole(role);
+      setLoadingPhone(phone);
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,54 +141,84 @@ export default function DemoLoginButtons() {
         return;
       }
 
-      router.push(`/${role}/dashboard`);
+      router.push(dashboardPath);
       router.refresh();
     } catch (err) {
       console.error("Demo login error:", err);
       alert("Error logging into demo account.");
     } finally {
-      setLoadingRole(null);
+      setLoadingPhone(null);
     }
   };
 
+  const filteredAccounts =
+    selectedHub === "all"
+      ? demoAccounts
+      : demoAccounts.filter((a) => a.district === selectedHub || a.district === "Global");
+
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-wider text-[#707070]">
-          ⚡ 1-Click Instant Demo Logins
-        </span>
-        <span className="text-[11px] text-[#a6a6a6]">Default password: password123</span>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <Sparkles className="w-4 h-4 text-[#25D366]" />
+          <span className="text-xs font-bold uppercase tracking-wider text-[#262626]">
+            1-Click Multi-District Demo Matrix
+          </span>
+        </div>
+        <div className="flex items-center gap-1 text-[11px]">
+          <span className="text-[#707070] font-medium">District Hub:</span>
+          <select
+            value={selectedHub}
+            onChange={(e) => setSelectedHub(e.target.value)}
+            className="px-2 py-0.5 rounded-lg border border-[#dcdcdc] bg-white text-xs font-bold focus:outline-none"
+          >
+            <option value="all">All Hubs (Global)</option>
+            <option value="Rampur">Rampur Hub (UP)</option>
+            <option value="Mandya">Mandya Hub (KA)</option>
+            <option value="Shivamogga">Shivamogga Hub (KA)</option>
+          </select>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        {demoAccounts.map((acc) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+        {filteredAccounts.map((acc) => {
           const Icon = acc.icon;
-          const isLoading = loadingRole === acc.role;
+          const isLoading = loadingPhone === acc.phone;
 
           return (
             <button
-              key={acc.role}
+              key={acc.phone}
               type="button"
-              disabled={loadingRole !== null}
-              onClick={() => handleDemoLogin(acc.phone, acc.role)}
-              className={`flex items-start gap-3 p-3 text-left rounded-xl border transition-all duration-150 ${acc.bgColor} ${
-                loadingRole !== null ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:border-[#707070] active:scale-[0.98] shadow-2xs"
-              }`}
+              disabled={loadingPhone !== null}
+              onClick={() => handleDemoLogin(acc.phone, acc.dashboardPath)}
+              className={`flex items-start gap-3 p-3 text-left rounded-2xl border transition-all duration-150 ${
+                acc.isSpecial
+                  ? "bg-[#1f2937] text-white border-[#374151] hover:border-[#53bdeb] shadow-xs"
+                  : "bg-white hover:bg-[#fafafa] border-[#dcdcdc] hover:border-[#a6a6a6] text-[#262626] shadow-2xs"
+              } ${loadingPhone !== null ? "opacity-60 cursor-not-allowed" : "cursor-pointer active:scale-[0.98]"}`}
             >
-              <div className="p-2 rounded-lg bg-[#f5f5f5] text-[#404040] border border-[#dcdcdc] shrink-0 mt-0.5">
+              <div
+                className={`p-2 rounded-xl border shrink-0 mt-0.5 ${
+                  acc.isSpecial
+                    ? "bg-[#111827] text-[#53bdeb] border-[#374151]"
+                    : "bg-[#f5f5f5] text-[#404040] border-[#dcdcdc]"
+                }`}
+              >
                 {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-[#404040]" />
+                  <Loader2 className="w-4 h-4 animate-spin text-current" />
                 ) : (
                   <Icon className="w-4 h-4" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#404040]">{acc.title}</span>
-                  <span className="text-[10px] text-[#707070] font-mono">{acc.phone}</span>
+                  <span className="text-xs font-bold truncate">{acc.title}</span>
+                  <span className="text-[10px] opacity-70 font-mono">{acc.phone}</span>
                 </div>
-                <p className="text-xs text-[#707070] truncate mt-0.5">{acc.name}</p>
-                <p className={`text-[11px] mt-1 ${acc.accent}`}>{acc.badge}</p>
+                <p className="text-xs opacity-80 truncate mt-0.5">{acc.name}</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className={`text-[10px] ${acc.accent}`}>{acc.badge}</span>
+                </div>
               </div>
             </button>
           );

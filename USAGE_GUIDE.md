@@ -5,29 +5,30 @@
 
 ## ⚡ 1-Click Startup
 
-Simply double-click **`start.bat`** in the project root directory.
+Simply double-click **`start.bat`** in the project root directory or run:
+```bash
+npm run dev
+```
 
-The script automatically:
-1. Verifies **Node.js** is installed.
-2. Installs dependencies if `node_modules` is missing.
-3. Initializes the **SQLite database** (`dev.db`) and seeds demo accounts if needed.
-4. Opens **`http://localhost:3000`** in your default web browser.
-5. Starts the **Next.js** local development server.
+The application automatically opens **`http://localhost:3000`** with zero external cloud configuration needed.
 
 ---
 
-## 🔑 Pre-Seeded Demo Accounts & Logins
+## 🔑 Pre-Seeded Multi-District Demo Matrix
 
-The application includes **1-Click Demo Login buttons** on the home page (`/`) and login page (`/login`). You can click any role button to log in immediately without typing passwords:
+The application includes **1-Click Demo Login buttons** on the home page (`/`) and login page (`/login`). You can click any role button to log in immediately without typing passwords (default password: `password123`):
 
-| Role | Name | Phone Number | Password | Key Capabilities |
-| :--- | :--- | :--- | :--- | :--- |
-| **Citizen** | Ramesh Sharma | `9876543210` | `password123` | Submit plain-text service requests, inspect assigned helper trust card, view live status timeline |
-| **Worker (Verified)** | Sunil Electrician | `9876543211` | `password123` | View auto-assigned jobs in Rampur, start work, mark jobs resolved with notes |
-| **Volunteer (Verified)** | Pooja (Rural Care NGO) | `9876543212` | `password123` | Handle assigned emergency tasks, claim open community pool requests |
-| **Local Authority** | Officer Suresh Verma | `9876543213` | `password123` | Full district triage matrix, manual worker dispatch, toggle personnel verification |
-| **Worker (Unverified)** | Manoj Plumber | `9876543214` | `password123` | Demonstrates verification gating (skipped by routing engine until verified) |
-| **Volunteer (Unverified)** | Vikas Volunteer | `9876543215` | `password123` | Demonstrates verification gating in Sitapur |
+| Persona & District | Name & Role | Phone Number | Key Capabilities & Verification |
+| :--- | :--- | :--- | :--- |
+| **⚡ Super Admin (Global)** | Vikram Rao (Director) | `9876543200` | State-wide telemetry across 6 hubs, API health diagnostics, authority provisioning |
+| **🏛️ Authority (Rampur UP)** | Amit District Officer | `9876543214` | Rampur triage matrix, manual worker dispatch, personnel verification manager |
+| **🏛️ Authority (Mandya KA)** | Priya District Officer | `9876543201` | Mandya triage matrix, agricultural & irrigation canal dispatch |
+| **👷 Worker (Rampur UP)** | Sunil Electrician | `9876543211` | Verified Electrician: civic tasks, storm safety alerts, on-site status updates |
+| **👷 Worker (Mandya KA)** | Devraj Mason | `9876543220` | Verified Mason: irrigation canal repair, farming labor dispatch |
+| **🤝 Volunteer (Rampur UP)** | Anita (Rural Care NGO) | `9876543213` | Verified Volunteer: emergency response, claim open community pool requests |
+| **🤝 Volunteer (Shivamogga)** | Sowmya (Red Cross Rural) | `9876543223` | Verified Medic/Volunteer: trauma care, ambulance dispatch |
+| **👨‍🌾 Citizen (Rampur UP)** | Ramesh Kumar (Hindi Native) | `9876543210` | Submit plain-text service requests, view Leaflet GIS map & helper trust card |
+| **👨‍🌾 Citizen (Mandya KA)** | Basavaraj Gowda (Kannada) | `9876543216` | Submit farming requests in Kannada, track real-time resolution timeline |
 
 ---
 
@@ -35,84 +36,76 @@ The application includes **1-Click Demo Login buttons** on the home page (`/`) a
 
 ### Scenario 1: Citizen Submits Request & Auto-Routing Assigns Worker
 1. Open [http://localhost:3000](http://localhost:3000).
-2. Click **"Citizen Demo"** (Ramesh Sharma).
+2. Click **"Citizen Demo (Ramesh Kumar)"**.
 3. Click **"Raise New Request"**.
-4. Select **"Civic / Infrastructure"** (Notice the priority badge automatically maps to `MEDIUM`).
-5. Enter Location: **`Rampur`**.
-6. Enter Description: *"Streetlight cable snapped and hanging low near the village pond."*
+4. Select **"Civic / Infrastructure"** (Notice priority badge automatically maps to `MEDIUM`).
+5. Choose District: **`Rampur`**, Location: **`Rampur Ward 4`** (or click **"GPS Pin"** for auto-detection).
+6. Upload a site photo (optional) and describe: *"Streetlight cable snapped near village school pond."*
 7. Click **"Submit & Route Request"**.
-8. **Result**: The routing engine searches Rampur, finds verified worker **Sunil Electrician**, automatically sets status to **`ASSIGNED`**, and redirects to the status timeline.
-9. Inspect the **"Assigned Service Handler"** trust card: it displays Sunil's name, role, trade (Electrician), and direct call button.
+8. **Result**: The routing engine computes distance (< 15km), matches verified **Sunil Electrician**, sets status to **`ASSIGNED`**, and renders the **Leaflet GIS Map Pin View** connecting citizen and worker coordinates.
 
 ---
 
-### Scenario 2: Worker Accepts Task, Starts Work & Marks Complete
-1. Log out (or click **"Worker Demo"** on `/login`).
-2. On the Worker Dashboard (`/worker/dashboard`), view the assigned civic task.
-3. Click **"Start Work"**, type an update note (*"Arrived with ladder and replacement insulation tape"*), and click **"Confirm & Update"**.
-4. The status updates to **`IN PROGRESS`** and logs a new audit event.
-5. Click **"Mark Complete"**, type a resolution note (*"Wire secured to pole and circuit tested safe"*), and submit.
-6. The status updates to **`RESOLVED`**.
+### Scenario 2: Field Worker Checks Weather & Resolves On-Site
+1. Switch account to **"Sunil Electrician"** (`9876543211`).
+2. On the Worker Dashboard (`/worker/dashboard`), view the live **Open-Meteo Weather Widget** (inspecting temperature and electrical storm advisories).
+3. Inspect the citizen's photo attachment and location.
+4. Click **"Start Work"** (status moves to `IN PROGRESS`).
+5. Click **"Mark Complete"**, type resolution note (*"Replaced 40m insulated line and re-anchored pole safely"*), and submit (`RESOLVED`).
 
 ---
 
-### Scenario 3: Citizen Reviews the Real-Time Audit Timeline
-1. Log back in as **Citizen Demo**.
-2. Open the request tracking page (`/citizen/request/[id]`).
-3. Scroll through the **Status History & Audit Trail** timeline.
-4. You will see every transition recorded in chronological order:
-   - **Step 1 (Open)**: Request submitted by citizen Ramesh.
-   - **Step 2 (Assigned)**: Auto-routed to verified worker Sunil Electrician.
-   - **Step 3 (In Progress)**: Worker note with timestamp.
-   - **Step 4 (Resolved)**: Completion note with timestamp.
+### Scenario 3: Super Admin State-Wide HQ & API Health Telemetry
+1. Log in as **"Super Admin (Vikram Rao)"** (`9876543200`).
+2. Navigate to **`/superadmin/dashboard`**.
+3. Inspect aggregate metrics across all 6 districts:
+   - **District Operations Breakdown**: Rampur, Sitapur, Mandya, Shivamogga, Kolar, Belagavi.
+   - **Cross-District Requests Table**: Filter by district or search across the entire state.
+   - **API Integrations Diagnostic Panel**: View live operational status for Geocoding, Open-Meteo Weather, SMS/OTP, WhatsApp Cloud, FCM Push, and Firebase Storage.
+   - **Authority Management**: Click **"Add District Authority"** to provision a new commissioner account with 1 click.
 
 ---
 
-### Scenario 4: Verification Gating & Local Authority Dispatch
-1. Log in as **Citizen Demo** and raise a request in **`Sitapur`** (where only unverified personnel exist).
-2. Submit: *"Water pipe burst near community clinic."*
-3. **Result**: Because the Sitapur worker/volunteer is unverified (`verified: false`), the routing engine skips them and marks the request as **`OPEN`** (Queued for Local Authority triage).
-4. Log in as **Authority Demo** (`/authority/dashboard`).
-5. In the **Civic Triage & Dispatch** table, locate the `OPEN` Sitapur request.
-6. Click **"Assign"**, select an available verified worker from the dropdown, add an official dispatch note, and confirm.
-7. Switch to the **"Manage Personnel Verification"** tab:
-   - Click **"Verify Personnel"** next to **Manoj Plumber** or **Vikas Volunteer** to activate them for future auto-matches!
+### Scenario 4: WhatsApp Bot & In-Browser Simulator
+1. Click the green floating **"WhatsApp Bot Demo"** button in the bottom right corner.
+2. In the simulator, click preset **"1. Start Wizard (HI)"**.
+3. Click preset **"2. Category (Civic)"** (sends `1`).
+4. Click preset **"3. Issue Description"** (sends description).
+5. Click preset **"4. Location (Rampur)"** (sends `Rampur`).
+6. **Result**: The WhatsApp bot invokes the deterministic routing engine and returns a formal WhatsApp receipt with Request ID, Status, and Helper Phone!
+7. Switch simulated sender to **Worker Sunil** and click preset **"6. Worker Done"** (sends `DONE <req_id> Wire secured`).
+8. The request is immediately marked **`RESOLVED`** in the SQLite database and citizen timeline!
 
 ---
 
-### Scenario 5: Volunteer Claims an Unassigned Community Pool Request
-1. Log in as **Volunteer Demo** (`/volunteer/dashboard`).
-2. Click the **"Available / Unassigned Pool"** tab.
-3. Browse open requests that were not automatically matched.
-4. Click **"Claim Request"** on any open issue.
-5. The request moves into your **"My Assigned Tasks"** tab with an audit message stating it was claimed by the volunteer.
+### Scenario 5: Multi-Language i18n Switcher
+1. Click the **Language Switcher** in the top navigation bar.
+2. Select **"हिंदी (Hindi)"** or **"ಕನ್ನಡ (Kannada)"**.
+3. All navigation links, category cards, priority badges, form labels, and dashboard summaries instantly translate without layout shift.
+4. Your language preference is automatically synced to your `User.language` account profile!
 
 ---
 
-## 🛠️ Handy Commands & Database Reset
+## 🛠️ Developer Commands & Extended Testing
 
-If you ever want to reset the database back to clean baseline demo data:
 ```bash
-# Re-seed demo database
+# 1. Push database schema
+npm run prisma:push
+
+# 2. Seed multi-district test data
 npm run prisma:seed
-```
 
-To view the database in the visual Prisma Studio GUI:
-```bash
-npx prisma studio
-```
-(Opens interactive database editor on [http://localhost:5555](http://localhost:5555)).
-
-To run the automated 21-point integration test suite:
-```bash
+# 3. Run full 53-point automated integration test suite
 npx tsx scratch/test_routing_and_roles.ts
+
+# 4. Production build check
+npm run build
 ```
 
 ---
 
-## 🏗️ Technical Highlights for Reviewers
-
-- **Zero ML/AI Flakiness**: 100% deterministic rule-based priority mapping and candidate matching.
-- **Strict Multi-Tenant Role Isolation**: Citizen, Worker, Volunteer, and Authority routes are enforced at the API and middleware layer.
-- **Audit Compliance**: Every single state change is recorded immutably in `request_updates` with user IDs, roles, and timestamps.
-- **Zero-Dependency SQLite Stack**: Runs out-of-the-box on any machine without Docker or external DB services.
+## 🛡️ Key Architectural Guarantees
+- **100% Deterministic**: Zero opaque ML/AI hallucinations in the core dispatch loop.
+- **Hard Verification Gate**: Unverified or inactive workers are strictly blocked from auto-assignment.
+- **Geometric GIS Radius**: Haversine distance calculations ensure dispatches stay within strict category limits.
+- **Zero-Cloud Fallback**: All 6 API integrations degrade gracefully to safe offline/mock modes with zero external keys required.

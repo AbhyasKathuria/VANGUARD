@@ -5,6 +5,9 @@ import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 import PriorityBadge from "@/components/PriorityBadge";
 import CategoryBadge from "@/components/CategoryBadge";
+import WeatherWidget from "@/components/WeatherWidget";
+import DashboardLanguageBanner from "@/components/DashboardLanguageBanner";
+import { useLanguage } from "@/lib/i18n/context";
 import {
   HeartHandshake,
   Clock,
@@ -19,9 +22,11 @@ import {
   Layers,
   Send,
   X,
+  ImageIcon,
 } from "lucide-react";
 
 export default function VolunteerDashboard() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"assigned" | "unassigned">("assigned");
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -123,18 +128,21 @@ export default function VolunteerDashboard() {
     );
   };
 
+  const primaryLocation = requests[0]?.district || requests[0]?.location || "Shivamogga";
+
   return (
     <div className="space-y-6">
+      {/* 1-Click Multi-Lingual Dashboard Switcher */}
+      <DashboardLanguageBanner />
+
       {/* Header */}
       <div className="bg-white p-6 rounded-2xl border border-[#dcdcdc] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#404040] bg-[#f5f5f5] px-2.5 py-1 rounded-md border border-[#dcdcdc]">
-            Volunteer Hub
+            {t.volunteer.badge}
           </span>
-          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">Community Volunteer Operations</h1>
-          <p className="text-xs text-[#707070] mt-0.5">
-            Manage assigned emergency/community jobs or claim unassigned requests from the open pool.
-          </p>
+          <h1 className="text-2xl font-extrabold text-[#404040] mt-2">{t.volunteer.pageTitle}</h1>
+          <p className="text-xs text-[#707070] mt-0.5">{t.volunteer.pageDesc}</p>
         </div>
 
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
@@ -144,7 +152,7 @@ export default function VolunteerDashboard() {
               fetchRequests();
             }}
             disabled={refreshing}
-            className="p-2.5 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] transition-colors"
+            className="p-2.5 rounded-xl border border-[#dcdcdc] hover:bg-[#f5f5f5] text-[#404040] transition-colors cursor-pointer"
             title="Refresh requests"
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
@@ -155,10 +163,13 @@ export default function VolunteerDashboard() {
             className="flex-1 sm:flex-none px-4 py-2.5 bg-[#404040] hover:bg-[#262626] text-white text-xs font-bold rounded-xl shadow-xs flex items-center justify-center gap-2 transition-colors"
           >
             <PlusCircle className="w-4 h-4" />
-            Raise on Behalf of Citizen
+            {t.nav.raiseForCitizen}
           </Link>
         </div>
       </div>
+
+      {/* Real-Time Civic & Weather Advisory */}
+      <WeatherWidget location={primaryLocation} />
 
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-[#dcdcdc] pb-2">
@@ -171,7 +182,7 @@ export default function VolunteerDashboard() {
           }`}
         >
           <HeartHandshake className="w-4 h-4" />
-          My Assigned Tasks
+          {t.volunteer.tabAssigned}
         </button>
 
         <button
@@ -183,7 +194,7 @@ export default function VolunteerDashboard() {
           }`}
         >
           <Layers className="w-4 h-4" />
-          Available / Unassigned Pool
+          {t.volunteer.tabPool}
         </button>
       </div>
 
@@ -232,6 +243,16 @@ export default function VolunteerDashboard() {
                   </div>
 
                   <p className="text-sm font-semibold text-[#404040] leading-snug">{req.description}</p>
+
+                  {/* Attachment */}
+                  {req.attachmentUrl && (
+                    <div className="relative rounded-xl overflow-hidden border border-[#dcdcdc] max-h-36 bg-[#f5f5f5]">
+                      <img src={req.attachmentUrl} alt="Site attachment" className="w-full h-36 object-cover" />
+                      <span className="absolute bottom-1.5 left-1.5 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-md flex items-center gap-1 font-bold">
+                        <ImageIcon className="w-3 h-3" /> Citizen Attachment
+                      </span>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 gap-2 p-3 bg-[#f5f5f5] rounded-xl text-xs border border-[#dcdcdc]">
                     <div>

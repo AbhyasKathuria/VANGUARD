@@ -1,4 +1,4 @@
-export type UserRole = "citizen" | "worker" | "authority" | "volunteer";
+export type UserRole = "citizen" | "worker" | "authority" | "volunteer" | "super_admin";
 
 export type RequestCategory = "health" | "civic" | "emergency" | "farming" | "other";
 
@@ -12,6 +12,7 @@ export interface JWTPayload {
   phone: string;
   role: UserRole;
   location: string;
+  district?: string;
 }
 
 export interface UserSession {
@@ -21,15 +22,23 @@ export interface UserSession {
   role: UserRole;
   language: string;
   location: string;
+  district?: string;
+  active?: boolean;
   workerProfile?: {
     profession: string;
     availability: boolean;
     location: string;
+    district?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     verified: boolean;
   } | null;
   volunteerProfile?: {
     organization: string;
     area: string;
+    district?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     availability: boolean;
     verified: boolean;
   } | null;

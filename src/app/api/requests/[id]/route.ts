@@ -59,6 +59,7 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden: You cannot access this request" }, { status: 403 });
     }
 
+    // Local authority and super_admin have district-wide and system-wide visibility
     return NextResponse.json({ request: requestItem });
   } catch (error: any) {
     console.error("Get request by ID error:", error);
