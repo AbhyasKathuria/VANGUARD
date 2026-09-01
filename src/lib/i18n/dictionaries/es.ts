@@ -53,8 +53,8 @@ export const es: typeof en = {
     faq: "Preguntas Frecuentes",
   },
   landing: {
-    badge: "MVP de Enrutamiento de Servicios Rurales",
-    headline: "Plataforma de Enrutamiento de Servicios Rurales",
+    badge: "Plataforma de Enrutamiento de Servicios Rurales",
+    headline: "Donde la Tradición se Une con la Tecnología",
     subheadline: "Un ciudadano rural no necesita lidiar con la burocracia gubernamental: describa su problema en texto sencillo y el sistema lo asignará automáticamente al trabajador verificado más cercano.",
     signInBtn: "Iniciar Sesión",
     createAccountBtn: "Crear Nueva Cuenta",

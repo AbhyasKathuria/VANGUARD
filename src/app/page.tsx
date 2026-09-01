@@ -40,7 +40,7 @@ export default function HomePage() {
         </div>
 
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#262626] tracking-tight leading-tight">
-          {t.common.appName}
+          {t.landing.headline || "Where Tradition Meets Technology"}
         </h1>
         <p className="text-base sm:text-lg text-[#545454] max-w-2xl mx-auto leading-relaxed">
           {t.landing.subheadline}

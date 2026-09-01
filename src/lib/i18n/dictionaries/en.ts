@@ -52,7 +52,7 @@ export const en = {
   },
   landing: {
     badge: "Deterministic Rural Service Routing MVP",
-    headline: "Rural Service Routing Platform",
+    headline: "Where Tradition Meets Technology",
     subheadline: "A rural citizen shouldn't need to navigate government red tape — describe your problem in plain text, and the engine automatically routes it to the nearest verified person.",
     signInBtn: "Sign In to Account",
     createAccountBtn: "Create New Account",
