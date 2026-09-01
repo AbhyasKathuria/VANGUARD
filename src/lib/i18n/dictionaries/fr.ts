@@ -53,8 +53,8 @@ export const fr: typeof en = {
     faq: "Foire Aux Questions",
   },
   landing: {
-    badge: "MVP de Routage de Services Ruraux",
-    headline: "Plateforme de Routage de Services Ruraux",
+    badge: "Plateforme de Routage de Services Ruraux",
+    headline: "De nos racines vers un avenir meilleur",
     subheadline: "Les citoyens ruraux n'ont plus à naviguer dans la bureaucratie : décrivez votre problème en texte clair, et le système l'assigne automatiquement au professionnel vérifié le plus proche.",
     signInBtn: "Se Connecter",
     createAccountBtn: "Créer un Compte",

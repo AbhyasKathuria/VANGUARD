@@ -53,8 +53,8 @@ export const de: typeof en = {
     faq: "Häufige Fragen",
   },
   landing: {
-    badge: "Deterministische Service-Routing-Plattform",
-    headline: "Routing-Plattform für ländliche Dienste",
+    badge: "Routing-Plattform für ländliche Dienste",
+    headline: "Von unseren Wurzeln zu einem besseren Morgen",
     subheadline: "Bürger müssen keine Behördengänge bewältigen: Beschreiben Sie Ihr Anliegen im Klartext, und das System weist es automatisch dem nächsten verifizierten Helfer zu.",
     signInBtn: "Im Konto anmelden",
     createAccountBtn: "Neues Konto erstellen",

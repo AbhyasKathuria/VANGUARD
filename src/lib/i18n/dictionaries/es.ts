@@ -54,7 +54,7 @@ export const es: typeof en = {
   },
   landing: {
     badge: "Plataforma de Enrutamiento de Servicios Rurales",
-    headline: "Donde la Tradición se Une con la Tecnología",
+    headline: "De nuestras raíces hacia un mejor mañana",
     subheadline: "Un ciudadano rural no necesita lidiar con la burocracia gubernamental: describa su problema en texto sencillo y el sistema lo asignará automáticamente al trabajador verificado más cercano.",
     signInBtn: "Iniciar Sesión",
     createAccountBtn: "Crear Nueva Cuenta",
