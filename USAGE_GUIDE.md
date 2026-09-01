@@ -78,11 +78,12 @@ The application includes **1-Click Demo Login buttons** on the home page (`/`) a
 
 ---
 
-### Scenario 5: Multi-Language i18n Switcher
-1. Click the **Language Switcher** in the top navigation bar.
-2. Select **"हिंदी (Hindi)"** or **"ಕನ್ನಡ (Kannada)"**.
-3. All navigation links, category cards, priority badges, form labels, and dashboard summaries instantly translate without layout shift.
+### Scenario 5: Universal Multi-Language Support (22+ Languages)
+1. Use the **Dashboard Language Banner** or the **Language Switcher** in the top navigation bar.
+2. Select any quick language (e.g. **हिन्दी**, **ಕನ್ನಡ**, **தமிழ்**, **తెలుగు**, **বাংলা**, **मराठी**, **Español**, **Français**, **العربية**, **Deutsch**) or click **"More (22+)..."** to search across all 22+ Indian and global languages.
+3. The whole application (homepage, 2-minute tour, demo matrix, authentication, citizen portal, worker dashboard, authority hub, and audit timelines) instantly translates.
 4. Your language preference is automatically synced to your `User.language` account profile!
+5. In the **WhatsApp Bot**, greet in your language (e.g. `வணக்கம்`, `नमस्ते`, `ನಮಸ್ಕಾರ`, `Hola`, `Bonjour`) or text `LANG <code|name>` to chat entirely in your native language.
 
 ---
 
@@ -95,10 +96,10 @@ npm run prisma:push
 # 2. Seed multi-district test data
 npm run prisma:seed
 
-# 3. Run full 53-point automated integration test suite
+# 3. Run full 73-point automated integration test suite
 npx tsx scratch/test_routing_and_roles.ts
 
-# 4. Production build check
+# 4. Run production build
 npm run build
 ```
 
