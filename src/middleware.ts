@@ -7,6 +7,7 @@ const SECRET_KEY = new TextEncoder().encode(JWT_SECRET);
 const COOKIE_NAME = "vanguard_auth_token";
 
 const roleDashboardMap: Record<string, string> = {
+  super_admin: "/superadmin/dashboard",
   citizen: "/citizen/dashboard",
   worker: "/worker/dashboard",
   volunteer: "/volunteer/dashboard",
@@ -16,6 +17,17 @@ const roleDashboardMap: Record<string, string> = {
 export async function middleware(request: NextRequest) {
   try {
     const { pathname } = request.nextUrl;
+
+    // Fast-bail: never intercept Next.js internal static assets or files
+    if (
+      pathname.startsWith("/_next") ||
+      pathname.startsWith("/api") ||
+      pathname.startsWith("/static") ||
+      pathname.includes(".")
+    ) {
+      return NextResponse.next();
+    }
+
     const token = request.cookies.get(COOKIE_NAME)?.value;
 
     let session: JWTPayload | null = null;
@@ -41,8 +53,14 @@ export async function middleware(request: NextRequest) {
     const isWorkerRoute = pathname.startsWith("/worker");
     const isVolunteerRoute = pathname.startsWith("/volunteer");
     const isAuthorityRoute = pathname.startsWith("/authority");
+    const isSuperAdminRoute = pathname.startsWith("/superadmin");
 
-    const isProtected = isCitizenRoute || isWorkerRoute || isVolunteerRoute || isAuthorityRoute;
+    const isProtected =
+      isCitizenRoute ||
+      isWorkerRoute ||
+      isVolunteerRoute ||
+      isAuthorityRoute ||
+      isSuperAdminRoute;
 
     if (isProtected) {
       if (!session) {
@@ -63,7 +81,10 @@ export async function middleware(request: NextRequest) {
       if (isVolunteerRoute && session.role !== "volunteer") {
         return NextResponse.redirect(new URL(userDashboard, request.url));
       }
-      if (isAuthorityRoute && session.role !== "authority") {
+      if (isAuthorityRoute && session.role !== "authority" && session.role !== "super_admin") {
+        return NextResponse.redirect(new URL(userDashboard, request.url));
+      }
+      if (isSuperAdminRoute && session.role !== "super_admin") {
         return NextResponse.redirect(new URL(userDashboard, request.url));
       }
     }
@@ -77,6 +98,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js)$).*)",
   ],
 };
