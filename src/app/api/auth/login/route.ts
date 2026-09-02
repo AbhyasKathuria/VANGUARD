@@ -111,7 +111,14 @@ export async function POST(request: Request) {
     }
 
     if (!user) {
-      return NextResponse.json({ error: "Invalid phone number or password." }, { status: 401 });
+      return NextResponse.json(
+        {
+          error: `No account found with phone number ${cleanPhone}. Please click "Sign Up" to create an account, or use one of the 1-Click Demo Accounts below.`,
+          notFound: true,
+          phone: cleanPhone,
+        },
+        { status: 401 }
+      );
     }
 
     // If password is password123 or matches the hash

@@ -75,9 +75,22 @@ export default function LoginPage() {
       {/* Form Card */}
       <div className="bg-white p-6 sm:p-7 rounded-2xl border border-[#dcdcdc] shadow-xs space-y-4">
         {error && (
-          <div className="p-3 bg-[#f5f5f5] text-[#404040] border border-[#a6a6a6] rounded-xl text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+          <div className="p-3.5 bg-[#fef2f2] text-[#991b1b] border border-[#fecaca] rounded-xl text-xs space-y-2">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+            {phone && (
+              <div className="pt-1">
+                <Link
+                  href={`/signup?phone=${encodeURIComponent(phone)}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#991b1b] hover:bg-[#7f1d1d] text-white font-bold rounded-lg transition-colors cursor-pointer text-xs"
+                >
+                  Create New Account with {phone}
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
