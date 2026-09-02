@@ -132,6 +132,26 @@ export async function POST(request: Request) {
     const finalLat = routingResult.coordinates?.latitude || providedCoords?.latitude || null;
     const finalLon = routingResult.coordinates?.longitude || providedCoords?.longitude || null;
 
+    // Ensure user exists in current lambda's SQLite database for foreign key relation
+    try {
+      await prisma.user.upsert({
+        where: { id: user.id },
+        update: {},
+        create: {
+          id: user.id,
+          name: user.name,
+          phone: user.phone || `98765${Math.floor(10000 + Math.random() * 90000)}`,
+          passwordHash: "$2a$10$wE99N502/KszZ1aWbA4lFuhQe56N63f35JmX99b8/qK2f2qY8fCwe",
+          role: user.role,
+          location: user.location || "Rampur",
+          district: finalDistrict,
+          language: user.language || "en",
+        },
+      });
+    } catch (upsertErr) {
+      console.warn("[Requests] User upsert notice:", upsertErr);
+    }
+
     // Create the Request and its initial audit trail update atomically
     const newRequest = await prisma.request.create({
       data: {

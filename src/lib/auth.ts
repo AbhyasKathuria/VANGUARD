@@ -61,27 +61,68 @@ export async function getCurrentUser(): Promise<UserSession | null> {
     const payload = await verifySessionToken(token);
     if (!payload?.userId) return null;
 
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-      include: {
-        workerProfile: true,
-        volunteerProfile: true,
-      },
-    });
+    let user: any = null;
+    try {
+      user = await prisma.user.findUnique({
+        where: { id: payload.userId },
+        include: {
+          workerProfile: true,
+          volunteerProfile: true,
+        },
+      });
 
-    if (!user) return null;
+      // If user was created on a different serverless lambda instance, sync to this instance's SQLite DB
+      if (!user && payload.phone) {
+        user = await prisma.user.upsert({
+          where: { phone: payload.phone },
+          update: {},
+          create: {
+            id: payload.userId,
+            name: payload.name || "Citizen",
+            phone: payload.phone,
+            passwordHash: "$2a$10$wE99N502/KszZ1aWbA4lFuhQe56N63f35JmX99b8/qK2f2qY8fCwe",
+            role: payload.role || "citizen",
+            location: payload.location || "Rampur",
+            district: payload.district || "Rampur",
+            language: "en",
+          },
+          include: {
+            workerProfile: true,
+            volunteerProfile: true,
+          },
+        });
+      }
+    } catch (dbErr) {
+      console.warn("[Auth] DB lookup error in getCurrentUser, falling back to verified JWT payload:", dbErr);
+    }
 
+    if (user) {
+      return {
+        id: user.id,
+        name: user.name,
+        phone: user.phone,
+        role: user.role as UserRole,
+        language: user.language || "en",
+        location: user.location || "Rampur",
+        district: user.district || "Rampur",
+        active: user.active ?? true,
+        workerProfile: user.workerProfile,
+        volunteerProfile: user.volunteerProfile,
+      };
+    }
+
+    // Fallback directly from cryptographically verified JWT payload
     return {
-      id: user.id,
-      name: user.name,
-      phone: user.phone,
-      role: user.role as UserRole,
-      language: user.language,
-      location: user.location,
-      district: user.district,
-      active: user.active,
-      workerProfile: user.workerProfile,
-      volunteerProfile: user.volunteerProfile,
+      id: payload.userId,
+      name: payload.name || "User",
+      phone: payload.phone || "",
+      role: (payload.role as UserRole) || "citizen",
+      language: "en",
+      location: payload.location || "Rampur",
+      district: payload.district || "Rampur",
+      active: true,
+      workerProfile: null,
+      volunteerProfile: null,
     };
   } catch (error: any) {
     if (error?.digest === "DYNAMIC_SERVER_USAGE" || error?.message?.includes("Dynamic server usage")) {

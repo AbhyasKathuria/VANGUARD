@@ -9,6 +9,7 @@ async function runAuthTest() {
 
   // 1. Test Seeded Users
   const users = await prisma.user.findMany({
+    where: { id: { startsWith: "usr_" } },
     select: { id: true, name: true, phone: true, role: true, passwordHash: true }
   });
   console.log(`\nFound ${users.length} seeded users in database.`);
